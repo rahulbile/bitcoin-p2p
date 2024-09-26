@@ -17,7 +17,7 @@
 
     <p id="current-price">Current Price: Loading...</p>
 
-    <label for="btc-amount">Amount:</label>
+    <label for="btc-amount"> BTC / Sats Amount:</label>
     <input type="number" id="btc-amount" placeholder="Enter amount">
 
     <br>
@@ -101,7 +101,7 @@
 
             // Display the result
             const resultMessage = `
-Selling  ${satoshis.toFixed(0)} Satoshis for INR ${currencyAmount} with Spot price as INR ${btcPrice} per BTC.
+Selling  ${satoshis.toFixed(0)} Satoshis  (${convertSatsToBTC(satoshis).toFixed(6)} BTC) for INR ${currencyAmount} with Spot price as INR ${btcPrice} per BTC.
             `;
             document.getElementById("price-result-custom").value = resultMessage.trim();
         }
