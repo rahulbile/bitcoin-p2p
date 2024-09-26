@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Price Calculator</title>
+</head>
+<body>
+    <h1>Bitcoin Price Calculator</h1>
+
+    <label for="exchange">Select Exchange:</label>
+    <select id="exchange" onchange="fetchCurrentPrice()">
+        <option value="coingecko" data-symbol="">CoinGecko </option>
+        <option value="binance" data-symbol="$">Binance </option>
+        <option value="coinbase" data-symbol="$">Coinbase </option>
+    </select>
+
+    <p id="current-price">Current Price: Loading...</p>
+
+    <label for="btc-amount">Amount of Bitcoin:</label>
+    <input type="number" id="btc-amount" placeholder="Enter BTC amount">
+
+    <label for="currency">Select Currency:</label>
+    <select id="currency" onchange="fetchCurrentPrice()">
+      <option value="inr" data-symbol="₹">INR (₹)</option>
+        <option value="usd" data-symbol="$">USD ($)</option>
+        <option value="eur" data-symbol="€">EUR (€)</option>
+    </select>
+
+    <label for="premium">Add Premium (%):</label>
+    <input type="number" id="premium" placeholder="Enter premium percentage" step="1" value="10">
+
+    <button onclick="calculatePrice()">Calculate</button>
+    <br>
+    <!-- Text Area for Result Display -->
+    <label for="price-result">Calculation Result:</label>
+    <br>
+    <textarea id="price-result" readonly rows="4" cols="50"></textarea>
+
+    <!-- Copy Button -->
+    <button onclick="copyToClipboard()">Copy Result to Clipboard</button>
+
+    <script>
+        // Fetch Bitcoin Price from CoinGecko
+        async function fetchFromCoinGecko(currency) {
+            const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=${currency}`);
+            const data = await response.json();
+            return data.bitcoin[currency];
+        }
+
+        // Fetch Bitcoin Price from Binance
+        async function fetchFromBinance() {
+            const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+            const data = await response.json();
+            return data.price;
+        }
+
+        // Fetch Bitcoin Price from Coinbase
+        async function fetchFromCoinbase(currency) {
+            const response = await fetch(`https://api.coinbase.com/v2/prices/spot?currency=${currency}`);
+            const data = await response.json();
+            return data.data.amount;
+        }
+
+        // Get the selected currency symbol
+        function getCurrencySymbol() {
+            const currency = document.getElementById("currency");
+            const symbol = currency.options[currency.selectedIndex].getAttribute("data-symbol");
+            return symbol;
+        }
+
+        // Fetch the current price based on the selected exchange
+        async function fetchCurrentPrice() {
+            const exchange = document.getElementById("exchange").value;
+            const currency = document.getElementById("currency").value;
+            const currencySymbol = getCurrencySymbol();
+
+            let price;
+
+            if (exchange === 'coingecko') {
+                price = await fetchFromCoinGecko(currency);
+            } else if (exchange === 'binance') {
+                price = await fetchFromBinance(); // Binance returns price in USDT (USD)
+            } else if (exchange === 'coinbase') {
+                price = await fetchFromCoinbase(currency);
+            }
+
+            // Update the current price display with currency symbol
+            document.getElementById("current-price").innerHTML = `
+                Current Price from ${exchange.toUpperCase()}: ${currencySymbol}${parseFloat(price).toFixed(2)} (${currency.toUpperCase()})
+            `;
+            return price;
+        }
+
+        // Calculate the price based on the selected exchange, currency, and premium
+        async function calculatePrice() {
+            const btcAmount = document.getElementById("btc-amount").value;
+            const currency = document.getElementById("currency").value;
+            const premiumPercentage = document.getElementById("premium").value;
+            const currencySymbol = getCurrencySymbol();
+
+            if (!btcAmount || !premiumPercentage) {
+                document.getElementById("price-result").value = "Please enter all values!";
+                return;
+            }
+
+            const price = await fetchCurrentPrice();  // Fetch current price based on exchange
+
+            let valueWithoutPremium = btcAmount * price;
+
+            // Add the premium
+            const premium = valueWithoutPremium * (premiumPercentage / 100);
+            const valueWithPremium = valueWithoutPremium + premium;
+
+            // Display both values (with and without premium) in the text area along with the currency symbol
+            const message = `
+Selling ${btcAmount} BTC with ${premiumPercentage}% Premium for ${currencySymbol}${valueWithPremium.toFixed(2)}
+(Spot price : ${currencySymbol}${valueWithoutPremium.toFixed(2)})
+            `;
+            document.getElementById("price-result").value = message.trim();  // Show in textarea
+        }
+
+        // Function to copy the message to clipboard
+        function copyToClipboard() {
+            const copyText = document.getElementById("price-result");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                document.execCommand("copy");
+            } catch (err) {
+                alert("Failed to copy!");
+            }
+        }
+
+        // Call fetchCurrentPrice when the page loads to show the default price (CoinGecko)
+        window.onload = fetchCurrentPrice;
+    </script>
+</body>
+</html>
