@@ -6,7 +6,7 @@
     <title>Bitcoin Price Calculator</title>
 </head>
 <body>
-    <h1>Bitcoin Price Calculator</h1>
+    <h1>Bitcoin Price Calculator (Spot Price via Exchange) </h1>
 
     <label for="exchange">Select Exchange:</label>
     <select id="exchange" onchange="fetchCurrentPrice()">
@@ -54,7 +54,71 @@
     <!-- Copy Button -->
     <button onclick="copyToClipboard()">Copy Result to Clipboard</button>
 
+    <h1>Bitcoin Sale Calculator (Custom Spot Price)  </h1>
+
+    <!-- Input field for manually specifying the BTC price -->
+    <label for="btc-price-custom">Specify Bitcoin Price (in your currency):</label>
+    <input type="number" id="btc-price-custom" placeholder="Enter BTC price in your currency" step="any">
+    <br><br>
+
+    <!-- Input field for entering the amount in currency to sell -->
+    <label for="currency-amount-custom">Enter Amount in Currency (e.g., INR):</label>
+    <input type="number" id="currency-amount-custom" placeholder="Enter amount in currency">
+    <br><br>
+
+    <button onclick="calculateSatoshis()">Calculate</button>
+    <br><br>
+
+    <!-- Text Area for Result Display -->
+    <label for="price-result-custom">Calculation Result:</label>
+    <br>
+    <textarea id="price-result-custom" readonly rows="4" cols="50"></textarea>
+
+    <!-- Copy Button -->
+    <button onclick="copyToClipboardCustom()">Copy Result to Clipboard</button>
+
     <script>
+        // Function to convert BTC to Satoshis (1 BTC = 100,000,000 Satoshis)
+        function convertBTCtoSats(btc) {
+            return btc * 100000000;  // 1 BTC = 100 million Satoshis
+        }
+
+        // Function to calculate Satoshis based on the entered amount and BTC price
+        function calculateSatoshis() {
+            const btcPrice = document.getElementById("btc-price-custom").value;
+            const currencyAmount = document.getElementById("currency-amount-custom").value;
+
+            if (!btcPrice || !currencyAmount) {
+                document.getElementById("price-result-custom").value = "Please enter both BTC price and amount in currency.";
+                return;
+            }
+
+            // Calculate the amount of BTC the user is selling for the entered currency amount
+            const btcAmount = currencyAmount / btcPrice;
+
+            // Convert the BTC amount to Satoshis
+            const satoshis = convertBTCtoSats(btcAmount);
+
+            // Display the result
+            const resultMessage = `
+Selling  ${satoshis.toFixed(0)} Satoshis for INR ${currencyAmount} with Spot price as INR ${btcPrice} per BTC.
+            `;
+            document.getElementById("price-result-custom").value = resultMessage.trim();
+        }
+
+        // Function to copy the result to clipboard
+        function copyToClipboardCustom() {
+            const copyText = document.getElementById("price-result-custom");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);  // For mobile devices
+
+            try {
+                document.execCommand("copy");
+            } catch (err) {
+                alert("Failed to copy!");
+            }
+        }
+
         // Fetch Bitcoin Price from CoinGecko
         async function fetchFromCoinGecko(currency) {
             const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=${currency}`);
@@ -143,7 +207,7 @@
 
             // Display both values (with and without premium) in the text area along with the currency symbol
             const message = `
-        Selling ${btcAmount} ${btcType === 'sats' ? 'Satoshis' : 'BTC'} (${btcValue.toFixed(8)} BTC) with ${premiumPercentage}% Premium for ${currencySymbol}${valueWithPremium.toFixed(2)} (Spot price: ${currencySymbol}${price})
+        Selling ${btcAmount} ${btcType === 'sats' ? 'Satoshis' : 'BTC'} (${btcValue.toFixed(8)} BTC) with ${premiumPercentage}% Premium for ${currencySymbol}${valueWithPremium.toFixed(2)} (Spot price: ${currencySymbol}${parseFloat(price).toFixed(2)})
             `;
             document.getElementById("price-result").value = message.trim();  // Show in textarea
         }
