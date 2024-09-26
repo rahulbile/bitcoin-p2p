@@ -143,7 +143,7 @@
 
             // Display both values (with and without premium) in the text area along with the currency symbol
             const message = `
-        Selling ${btcAmount} ${btcType === 'sats' ? 'Satoshis' : 'BTC'} (${btcValue.toFixed(8)} BTC) with ${premiumPercentage}% Premium for ${currencySymbol}${valueWithPremium.toFixed(2)} (Spot price: ${currencySymbol}${valueWithoutPremium.toFixed(2)})
+        Selling ${btcAmount} ${btcType === 'sats' ? 'Satoshis' : 'BTC'} (${btcValue.toFixed(8)} BTC) with ${premiumPercentage}% Premium for ${currencySymbol}${valueWithPremium.toFixed(2)} (Spot price: ${currencySymbol}${price})
             `;
             document.getElementById("price-result").value = message.trim();  // Show in textarea
         }
