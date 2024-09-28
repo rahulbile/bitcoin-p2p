@@ -77,7 +77,43 @@
     <!-- Copy Button -->
     <button onclick="copyToClipboardCustom()">Copy Result to Clipboard</button>
 
+
+    <h1>Bitcoin Premium Calculator</h1>
+
+    <!-- Select Exchange -->
+    <label for="premium-exchange">Select Exchange:</label>
+    <select id="premium-exchange" onchange="fetchCurrentPrice('premium-current-price', 1, 'premium-exchange')">
+        <option value="coindcx" data-symbol="">CoinDcx</option>
+        <option value="coingecko" data-symbol="">CoinGecko</option>
+        <option value="coinbase" data-symbol="$">Coinbase</option>
+    </select>
+
+    <!-- Current Price in INR -->
+    <p id="premium-current-price">Current Price: Loading...</p>
+
+    <!-- Input Fields for INR and BTC/Satoshis -->
+    <label for="amount-inr">Enter Amount in INR:</label>
+    <input type="number" id="amount-inr" placeholder="Enter amount in INR">
+    <br>
+    <label for="amount-type">Amount Type:</label>
+    <select id="amount-type">
+        <option value="btc">BTC</option>
+        <option value="sats">Satoshis</option>
+    </select>
+    <br>
+    <label for="premium-btc-amount">Enter BTC/Satoshis:</label>
+    <input type="number" id="premium-btc-amount" placeholder="Enter BTC or Satoshis">
+
+    <!-- Button to Calculate -->
+    <button onclick="calculatePremium()">Calculate Premium</button>
+    <br>
+    <br>
+    <!-- Result -->
+    <textarea id="premium-result" readonly rows="4" cols="50"></textarea>
+
     <script>
+        let exchangeRateINR = 0;
+
         // Function to convert BTC to Satoshis (1 BTC = 100,000,000 Satoshis)
         function convertBTCtoSats(btc) {
             return btc * 100000000;  // 1 BTC = 100 million Satoshis
@@ -154,10 +190,10 @@ Selling  ${satoshis.toFixed(0)} Satoshis  (${convertSatsToBTC(satoshis).toFixed(
         }
 
         // Fetch the current price based on the selected exchange
-        async function fetchCurrentPrice() {
-            const exchange = document.getElementById("exchange").value;
-            const currency = document.getElementById("currency").value;
-            const currencySymbol = getCurrencySymbol();
+        async function fetchCurrentPrice(elementId = 'current-price', skipCurrency, exchangeId = 'exchange') {
+            const exchange = document.getElementById(exchangeId).value;
+            const currency = skipCurrency ? 'inr' : document.getElementById("currency").value;
+            const currencySymbol = skipCurrency ? "₹" : getCurrencySymbol();
 
             let price;
 
@@ -169,10 +205,14 @@ Selling  ${satoshis.toFixed(0)} Satoshis  (${convertSatsToBTC(satoshis).toFixed(
                 price = await fetchFromCoinDcx(currency);
             }
 
+            exchangeRateINR = parseFloat(price);
             // Update the current price display with currency symbol
-            document.getElementById("current-price").innerHTML = `
+            // If the element Id is passed, use it.
+
+            document.getElementById(elementId).innerHTML = `
                 Current Price from ${exchange.toUpperCase()}: ${currencySymbol}${parseFloat(price).toFixed(2)} (${currency.toUpperCase()})
             `;
+
             return price;
         }
 
@@ -226,8 +266,45 @@ Selling  ${satoshis.toFixed(0)} Satoshis  (${convertSatsToBTC(satoshis).toFixed(
             }
         }
 
+
+        // Calculate the premium based on user input
+        async function calculatePremium() {
+            const amountINR = parseFloat(document.getElementById("amount-inr").value);
+            const amountType = document.getElementById("amount-type").value;
+            const btcAmount = parseFloat(document.getElementById("premium-btc-amount").value);
+
+            if (!amountINR || !btcAmount || !exchangeRateINR) {
+                alert('Please enter all values and ensure the exchange rate is loaded.');
+                return;
+            }
+
+            let btcValue;
+            if (amountType === 'btc') {
+                btcValue = btcAmount;
+            } else if (amountType === 'sats') {
+                btcValue = btcAmount / 100000000; // Convert Satoshis to BTC
+            }
+
+            // Calculate implied BTC price
+            const impliedBtcPrice = amountINR / btcValue;
+
+            // Calculate the premium
+            const premiumPercentage = ((impliedBtcPrice - exchangeRateINR) / exchangeRateINR) * 100;
+
+            // Display result
+            document.getElementById("premium-result").value = `Implied BTC Price: ₹${impliedBtcPrice.toFixed(2)}
+Current Exchange Rate: ₹${exchangeRateINR.toFixed(2)}
+Premium: ${premiumPercentage.toFixed(2)}%
+            `;
+
+        }
+
         // Call fetchCurrentPrice when the page loads to show the default price (CoinGecko)
-        window.onload = fetchCurrentPrice;
+        window.onload = fetchCurrentPrice();
+        window.onload = fetchCurrentPrice('premium-current-price', 1, 'premium-exchange');
+    </script>
+    <script>
+
     </script>
 </body>
 </html>
