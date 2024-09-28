@@ -183,6 +183,7 @@ Selling  ${satoshis.toFixed(0)} Satoshis  (${convertSatsToBTC(satoshis).toFixed(
             const currency = document.getElementById("currency").value;
             const premiumPercentage = document.getElementById("premium").value;
             const currencySymbol = getCurrencySymbol();
+            const exchange = document.getElementById("exchange").value;
 
             if (!btcAmount || !premiumPercentage) {
                 document.getElementById("price-result").value = "Please enter all values!";
@@ -207,7 +208,7 @@ Selling  ${satoshis.toFixed(0)} Satoshis  (${convertSatsToBTC(satoshis).toFixed(
 
             // Display both values (with and without premium) in the text area along with the currency symbol
             const message = `
-        Selling ${btcAmount} ${btcType === 'sats' ? 'Satoshis' : 'BTC'} (${btcValue.toFixed(8)} BTC) with ${premiumPercentage}% Premium for ${currencySymbol}${valueWithPremium.toFixed(2)} (Spot price: ${currencySymbol}${parseFloat(price).toFixed(2)})
+        Selling ${btcAmount} ${btcType === 'sats' ? 'Satoshis' : 'BTC'} (${btcValue.toFixed(8)} BTC) with ${premiumPercentage}% Premium for ${currencySymbol}${valueWithPremium.toFixed(2)} ( ${exchange.toUpperCase()} Spot price: ${currencySymbol}${parseFloat(price).toFixed(2)} )
             `;
             document.getElementById("price-result").value = message.trim();  // Show in textarea
         }
