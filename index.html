@@ -313,9 +313,15 @@
             // Convert the BTC amount to Satoshis
             const satoshis = convertBTCtoSats(btcAmount);
 
+            // Get the current timestamp and format it
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString();
+            const formattedTime = now.toLocaleTimeString();
+
+
             // Display the result
             const resultMessage = `
-Selling  ${satoshis.toFixed(0)} Sats  (${convertSatsToBTC(satoshis).toFixed(6)} BTC) for INR ${currencyAmount} with Spot price as INR ${btcPrice} per BTC.
+Selling  ${satoshis.toFixed(0)} Sats  (${convertSatsToBTC(satoshis).toFixed(6)} BTC) for INR ${currencyAmount} with Spot price as INR ${btcPrice} per BTC. \nCalculated on: ${formattedDate} ${formattedTime}
             `;
             document.getElementById("price-result-custom").value = resultMessage.trim();
         }
@@ -424,10 +430,15 @@ Selling  ${satoshis.toFixed(0)} Sats  (${convertSatsToBTC(satoshis).toFixed(6)} 
             const premium = valueWithoutPremium * (premiumPercentage / 100);
             const valueWithPremium = valueWithoutPremium + premium;
 
+            // Get the current timestamp and format it
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString();
+            const formattedTime = now.toLocaleTimeString();
+
             // Display both values (with and without premium) in the text area along with the currency symbol
             const message = `
         Selling ${btcAmount} ${btcType === 'sats' ? 'Sats' : 'BTC'} (${btcValue.toFixed(8)} BTC) with ${premiumPercentage}% Premium for ${currencySymbol}${valueWithPremium.toFixed(2)} ( ${exchange.toUpperCase()} Spot price: ${currencySymbol}${parseFloat(price).toFixed(2)} )
-            `;
+            \nCalculated on: ${formattedDate} ${formattedTime}`;
             document.getElementById("price-result").value = message.trim();  // Show in textarea
         }
 
