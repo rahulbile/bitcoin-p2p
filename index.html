@@ -152,6 +152,21 @@
             box-sizing: border-box;
         }
 
+        /* Inline arrangement for radio buttons and their labels */
+        .inline-radio {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Space between radio buttons and labels */
+        }
+
+        /* Optional: Styling to ensure all buttons have consistent spacing */
+        .inline-radio label {
+            margin-right: 15px; /* Adjust space between each label */
+            margin-top:auto;
+        }
+        .inline-radio input {
+          width:10px;
+        }
     </style>
     <title>Bitcoin Price Calculator</title>
 </head>
@@ -175,11 +190,13 @@
     <br>
 
     <!-- Bitcoin/Sats selector -->
-    <label for="btc-type">Select Type:</label>
-    <select id="btc-type">
-        <option value="btc">BTC</option>
-        <option value="sats">Sats</option>
-    </select>
+    <label>Select Type:</label>
+    <div class="inline-radio">
+        <input type="radio" id="btc" name="btc-type" value="btc"  checked="checked">
+        <label for="btc">BTC</label>
+        <input type="radio" id="sats" name="btc-type" value="sats">
+        <label for="sats">Sats</label>
+    </div>
 
     <br>
 
@@ -252,11 +269,14 @@
     <label for="amount-inr">Enter Amount in INR:</label>
     <input type="number" id="amount-inr" placeholder="Enter amount in INR">
     <br>
-    <label for="amount-type">Amount Type:</label>
-    <select id="amount-type">
-        <option value="btc">BTC</option>
-        <option value="sats">Sats</option>
-    </select>
+    <label>Select Type:</label>
+    <div class="inline-radio">
+        <input type="radio" id="btc" name="amount-type" value="btc"  checked="checked">
+        <label for="btc">BTC</label>
+        <input type="radio" id="sats" name="amount-type" value="sats">
+        <label for="sats">Sats</label>
+    </div>
+
     <br>
     <label for="premium-btc-amount">Enter BTC/Sats:</label>
     <input type="number" id="premium-btc-amount" placeholder="Enter BTC or Sats">
@@ -377,7 +397,7 @@ Selling  ${satoshis.toFixed(0)} Sats  (${convertSatsToBTC(satoshis).toFixed(6)} 
         // Calculate the price based on the selected exchange, currency, and premium
         async function calculatePrice() {
             const btcAmount = document.getElementById("btc-amount").value;
-            const btcType = document.getElementById("btc-type").value;
+            const btcType = document.querySelector('input[name="btc-type"]:checked').value;
             const currency = document.getElementById("currency").value;
             const premiumPercentage = document.getElementById("premium").value;
             const currencySymbol = getCurrencySymbol();
@@ -428,7 +448,7 @@ Selling  ${satoshis.toFixed(0)} Sats  (${convertSatsToBTC(satoshis).toFixed(6)} 
         // Calculate the premium based on user input
         async function calculatePremium() {
             const amountINR = parseFloat(document.getElementById("amount-inr").value);
-            const amountType = document.getElementById("amount-type").value;
+            const amountType = document.querySelector('input[name="amount-type"]:checked').value;
             const btcAmount = parseFloat(document.getElementById("premium-btc-amount").value);
 
             if (!amountINR || !btcAmount || !exchangeRateINR) {
