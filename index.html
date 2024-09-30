@@ -177,8 +177,8 @@
     <!-- Bitcoin/Sats selector -->
     <label for="btc-type">Select Type:</label>
     <select id="btc-type">
-        <option value="btc">Bitcoin (BTC)</option>
-        <option value="sats">Satoshis (Sats)</option>
+        <option value="btc">BTC</option>
+        <option value="sats">Sats</option>
     </select>
 
     <br>
@@ -255,11 +255,11 @@
     <label for="amount-type">Amount Type:</label>
     <select id="amount-type">
         <option value="btc">BTC</option>
-        <option value="sats">Satoshis</option>
+        <option value="sats">Sats</option>
     </select>
     <br>
-    <label for="premium-btc-amount">Enter BTC/Satoshis:</label>
-    <input type="number" id="premium-btc-amount" placeholder="Enter BTC or Satoshis">
+    <label for="premium-btc-amount">Enter BTC/Sats:</label>
+    <input type="number" id="premium-btc-amount" placeholder="Enter BTC or Sats">
 
     <!-- Button to Calculate -->
     <button onclick="calculatePremium()">Calculate Premium</button>
@@ -295,7 +295,7 @@
 
             // Display the result
             const resultMessage = `
-Selling  ${satoshis.toFixed(0)} Satoshis  (${convertSatsToBTC(satoshis).toFixed(6)} BTC) for INR ${currencyAmount} with Spot price as INR ${btcPrice} per BTC.
+Selling  ${satoshis.toFixed(0)} Sats  (${convertSatsToBTC(satoshis).toFixed(6)} BTC) for INR ${currencyAmount} with Spot price as INR ${btcPrice} per BTC.
             `;
             document.getElementById("price-result-custom").value = resultMessage.trim();
         }
@@ -406,7 +406,7 @@ Selling  ${satoshis.toFixed(0)} Satoshis  (${convertSatsToBTC(satoshis).toFixed(
 
             // Display both values (with and without premium) in the text area along with the currency symbol
             const message = `
-        Selling ${btcAmount} ${btcType === 'sats' ? 'Satoshis' : 'BTC'} (${btcValue.toFixed(8)} BTC) with ${premiumPercentage}% Premium for ${currencySymbol}${valueWithPremium.toFixed(2)} ( ${exchange.toUpperCase()} Spot price: ${currencySymbol}${parseFloat(price).toFixed(2)} )
+        Selling ${btcAmount} ${btcType === 'sats' ? 'Sats' : 'BTC'} (${btcValue.toFixed(8)} BTC) with ${premiumPercentage}% Premium for ${currencySymbol}${valueWithPremium.toFixed(2)} ( ${exchange.toUpperCase()} Spot price: ${currencySymbol}${parseFloat(price).toFixed(2)} )
             `;
             document.getElementById("price-result").value = message.trim();  // Show in textarea
         }
